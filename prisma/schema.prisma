@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Connection URL is configured in prisma.config.ts for Migrate.
+}
+
+model Game {
+  id         Int    @id @default(autoincrement())
+  name       String
+  identifier String
+
+  sets CardSet[]
+}
+
+model CardSet {
+  id          Int      @id @default(autoincrement())
+  gameId      Int // FK
+  name        String
+  code        String
+  releaseDate DateTime
+
+  game Game @relation(fields: [gameId], references: [id])
+}
+
+model CardPrinting {
+  id              Int    @id @default(autoincrement())
+  cardSetId       Int // FK
+  name            String
+  collectorNumber String
+  rarity          String
+  imageUrl        String
+  oracleText      String
+  manaCost        String
+}
+
+model CardVariant {
+  id         Int     @id @default(autoincrement())
+  printingId Int // FK
+  condition  String
+  language   String
+  foil       Boolean
+}
+
+model Inventory {
+  id        Int   @id @default(autoincrement())
+  variantId Int // FK
+  quantity  Int
+  price     Decimal
+}
