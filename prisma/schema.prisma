@@ -13,14 +13,17 @@ datasource db {
   // Connection URL is configured in prisma.config.ts for Migrate.
 }
 
+// MTG? POKEMON? YUGIOH? 
 model Game {
   id         Int    @id @default(autoincrement())
   name       String
   identifier String
 
+  // many cardsets
   sets CardSet[]
 }
 
+// Bloomburrow? Duskmourne? Mega Evolution? [kapag nag add for pokemon may mga series pa and sa series nandon yung mga sets nila dagdag problema pa] 
 model CardSet {
   id          Int      @id @default(autoincrement())
   gameId      Int // FK
@@ -28,31 +31,52 @@ model CardSet {
   code        String
   releaseDate DateTime
 
+  // one game
   game Game @relation(fields: [gameId], references: [id])
+
+  // many printings
+  printings CardPrinting[]
 }
 
+// The actual cards
 model CardPrinting {
-  id              Int    @id @default(autoincrement())
-  cardSetId       Int // FK
+  id        Int @id @default(autoincrement())
+  cardSetId Int // FK
+
+  // stats
   name            String
   collectorNumber String
   rarity          String
   imageUrl        String
   oracleText      String
   manaCost        String
+
+  cardSet CardSet @relation(fields: [cardSetId], references: [id])
+
+  // many variants
+  variant CardVariant[]
 }
 
+// parang mga PSA but for MTG
 model CardVariant {
   id         Int     @id @default(autoincrement())
   printingId Int // FK
   condition  String
   language   String
   foil       Boolean
+
+  // one printing
+  printing CardPrinting @relation(fields: [printingId], references: [id])
+
+  inventory Inventory?
 }
 
+// stock
 model Inventory {
-  id        Int   @id @default(autoincrement())
-  variantId Int // FK
+  id        Int     @id @default(autoincrement())
+  variantId Int     @unique // FK
   quantity  Int
   price     Decimal
+
+  variant CardVariant @relation(fields: [variantId], references: [id])
 }
