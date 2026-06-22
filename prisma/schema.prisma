@@ -17,7 +17,7 @@ datasource db {
 model Game {
   id         Int    @id @default(autoincrement())
   name       String
-  identifier String
+  identifier String @unique
 
   // many cardsets
   sets CardSet[]
@@ -28,7 +28,7 @@ model CardSet {
   id          Int      @id @default(autoincrement())
   gameId      Int // FK
   name        String
-  code        String
+  code        String @unique
   releaseDate DateTime
 
   // one game
@@ -48,13 +48,15 @@ model CardPrinting {
   collectorNumber String
   rarity          String
   imageUrl        String
-  oracleText      String
-  manaCost        String
+  oracleText      String?
+  manaCost        String?
 
   cardSet CardSet @relation(fields: [cardSetId], references: [id])
 
   // many variants
-  variant CardVariant[]
+  variants CardVariant[]
+
+  @@unique([cardSetId, collectorNumber])
 }
 
 // parang mga PSA but for MTG
@@ -69,6 +71,9 @@ model CardVariant {
   printing CardPrinting @relation(fields: [printingId], references: [id])
 
   inventory Inventory?
+
+  @@unique([printingId, condition, language, foil])
+  saleItems SaleItem[]
 }
 
 // stock
@@ -76,7 +81,39 @@ model Inventory {
   id        Int     @id @default(autoincrement())
   variantId Int     @unique // FK
   quantity  Int
-  price     Decimal
+
+  costPrice     Decimal @db.Decimal(10, 2) // max 99999999.99
+  sellPrice      Decimal @db.Decimal(10, 2) // max 99999999.99
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // if ever damaged or something, add notes here
+  notes String?
+
+  variant CardVariant @relation(fields: [variantId], references: [id])
+}
+
+// receipts
+model Sale {
+  id Int @id @default(autoincrement())
+  soldAt DateTime @default(now())
+  total Decimal @db.Decimal(10, 2) // max 99999999.99
+
+  items SaleItem[]
+}
+
+// items in a receipt
+model SaleItem {
+  id Int @id @default(autoincrement())
+  saleId Int // FK
+  variantId Int // FK
+  quantity Int
+
+  costPrice Decimal @db.Decimal(10, 2) // max 99999999.99
+  sellPrice Decimal @db.Decimal(10, 2) // max 99999999
+
+  sale Sale @relation(fields: [saleId], references: [id])
 
   variant CardVariant @relation(fields: [variantId], references: [id])
 }
