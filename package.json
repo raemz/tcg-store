@@ -4,16 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^26.0.0",
-    "prisma": "^7.8.0"
+    "@types/pg": "^8.20.0",
+    "prisma": "^7.8.0",
+    "tsx": "^4.22.4",
+    "typescript": "^6.0.3"
   },
   "dependencies": {
-    "@prisma/client": "^7.8.0"
+    "@hono/node-server": "^2.0.6",
+    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/client": "^7.8.0",
+    "hono": "^4.12.26",
+    "pg": "^8.22.0",
+    "zod": "^4.4.3"
   }
 }
