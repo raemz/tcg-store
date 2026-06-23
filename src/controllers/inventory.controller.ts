@@ -1,6 +1,7 @@
 import { createInventorySchema } from "../validators/inventory.validator";
 import * as inventoryService from "../services/inventory.service";
 import { stockAdjustmentSchema } from "../validators/stock.validator";
+import { prisma } from "../db/prisma";
 
 
 export async function createInventory(c: any) {
@@ -40,3 +41,17 @@ export async function decreaseStock(c: any) {
 
     return c.json(result);
 }
+
+export async function getAllInventory(c: any) {
+    const inventory = await inventoryService.getAllInvetory();
+
+    return c.json(inventory)
+}
+
+export async function getInventoryById(c: any) {
+    const id = Number(c.req.param("id"));
+    const inventory = await inventoryService.getInventoryById(id);
+
+    return c.json(inventory);
+}
+
