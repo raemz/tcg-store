@@ -5,3 +5,11 @@ export async function getSummary(c: any) {
 
     return c.json(result);
 }
+
+export async function getDailySales(c: any) {
+
+    const result =
+        await reportService.getDailySales();
+
+    return c.json(result);
+}

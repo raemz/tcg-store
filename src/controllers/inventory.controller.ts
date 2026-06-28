@@ -55,3 +55,19 @@ export async function getInventoryById(c: any) {
     return c.json(inventory);
 }
 
+export async function getLowStock(c: any) {
+    const threshold = Number(c.req.query("threshold")) || 3;
+
+    const result = await inventoryService.getLowStock(threshold);
+
+    return c.json(result);
+}
+
+export async function searchInventory(c: any) {
+    const query = c.req.query("q") ?? "";
+
+    const result = await inventoryService.searchInventory(query);
+
+    return c.json(result);
+}
+

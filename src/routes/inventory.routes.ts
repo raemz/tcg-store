@@ -4,7 +4,9 @@ import {
     increaseStock,
     decreaseStock,
     getAllInventory,
-    getInventoryById
+    getInventoryById,
+    getLowStock,
+    searchInventory
 } from "../controllers/inventory.controller";
 
 const inventoryRoutes = new Hono();
@@ -14,5 +16,7 @@ inventoryRoutes.patch(":id/increase", increaseStock);
 inventoryRoutes.patch(":id/decrease", decreaseStock);
 inventoryRoutes.get("/", getAllInventory);
 inventoryRoutes.get("/:id", getInventoryById);
+inventoryRoutes.get("/low-stock", getLowStock);
+inventoryRoutes.get("/search", searchInventory);
 
 export default inventoryRoutes;

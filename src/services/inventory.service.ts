@@ -114,3 +114,44 @@ export async function deleteInventory(id: number) {
     })
 }
 
+export async function getLowStock(threshold = 3) {
+    return prisma.inventory.findMany({
+        where: {
+            quantity: {
+                lte: threshold
+            }
+        },
+        include: {
+            variant: {
+                include: {
+                    printing: true         
+                }
+            }
+        },
+        orderBy: {
+            quantity: "asc"
+        }
+    });
+}
+
+export async function searchInventory(search: string) {
+    return prisma.inventory.findMany({
+        where: {
+            variant: {
+                printing: {
+                    name: {
+                        contains: search,
+                        mode: "insensitive"
+                    }
+                }
+            }
+        },
+        include: {
+            variant: {
+                include: {
+                    printing: true
+                }
+            }
+        }
+    });
+}
