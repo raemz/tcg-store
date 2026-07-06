@@ -26,7 +26,7 @@ export function errorHandler(err: any) {
             case "P2002":
 
                 return {
-                    status: 409,
+                    status: 409 as const,
                     body: {
                         success: false,
                         error: "Duplicate record."
@@ -36,7 +36,7 @@ export function errorHandler(err: any) {
             case "P2003":
 
                 return {
-                    status: 400,
+                    status: 400 as const,
                     body: {
                         success: false,
                         error: "Foreign key constraint failed."
@@ -46,7 +46,7 @@ export function errorHandler(err: any) {
             case "P2025":
 
                 return {
-                    status: 404,
+                    status: 404 as const,
                     body: {
                         success: false,
                         error: "Record not found."
@@ -56,7 +56,7 @@ export function errorHandler(err: any) {
             default:
 
                 return {
-                    status: 500,
+                    status: 500 as const,
                     body: {
                         success: false,
                         error: err.message
