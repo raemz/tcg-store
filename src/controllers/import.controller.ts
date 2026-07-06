@@ -1,9 +1,10 @@
+import { importSetSchema } from "../validators/import.validator";
 import * as importService from "../services/import.service";
 
 export async function importSet(c: any) {
-    const code = c.req.param("code");
-
-    const result = await importService.importSet(code);
+    const body = await c.req.json();
+    const validated = importSetSchema.parse(body);
+    const result = await importService.importSet(validated.setCode);
 
     return c.json(result);
 }

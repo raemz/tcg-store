@@ -21,7 +21,8 @@ export function mapCard(card: any) {
             rarity: card.rarity,
             imageUrl: card.image_uris?.normal ?? "",
             oracleText: card.oracle_text ?? null,
-            manaCost: card.mana_cost ?? null
+            manaCost: card.mana_cost ?? null,
+            colors: card.colors,
         }
     };
 }

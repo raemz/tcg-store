@@ -2,9 +2,23 @@ import { success } from "zod";
 import { prisma } from "../db/prisma";
 import { getSet, getCardsBySet} from "./scryfall.service";
 
-export async function importSet(code: string) {
+export async function importSet(setCode: string) {
+    //? To disable set import repeat
+    // const existingSet = await prisma.cardSet.findUnique({
+    //     where: {
+    //         code: setCode.toLowerCase(),
+    //     }
+    // });
+
+    // if(existingSet) {
+    //     return {
+    //         success: false,
+    //         message: `${existingSet.name} has already been imported!`,
+    //     }
+    // }
+
     // const set = await getSet(code);
-    const cards = await getCardsBySet(code);
+    const cards = await getCardsBySet(setCode);
 
     console.log(`Downloaded ${cards.length} cards`);
 
@@ -46,22 +60,24 @@ export async function importSet(code: string) {
         imageUrl: card.printing.imageUrl,
         oracleText: card.printing.oracleText,
         manaCost: card.printing.manaCost,
+        colors: card.printing.colors
     }));
 
-    // mass inert
+    // mass inert, randomized id?? 
+    // with DB auto generated id
     await prisma.cardPrinting.createMany({
         data: printingData,
         skipDuplicates: true,
     });
 
-    // get all card printing
+    // get all card printing id
     const printings = await prisma.cardPrinting.findMany({
         where: {
             cardSetId: cardSet.id,
         },
     });
 
-    
+    // to get the card id:
     const printingMap = new Map(
         printings.map(printing => [
             printing.collectorNumber,
@@ -69,6 +85,7 @@ export async function importSet(code: string) {
         ])
     );
     
+    // non foil:
     const variantData = cards.map(card => ({
         printingId: printingMap.get(card.printing.collectorNumber)!,
         condition: "NM",
