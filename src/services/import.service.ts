@@ -6,6 +6,8 @@ import {
     createPrintings,
     getPrintingsBySet,
 } from "../repositories/printing.repository";
+import { generateVariants } from "../utils/variant-generator";
+import { buildPrintingData } from "../builders/printing.builder";
 
 import {
     createVariants,
@@ -15,6 +17,8 @@ import {
 import {
     createInventory,
 } from "../repositories/inventory.repository";
+import { buildPrintingMap } from "../builders/printing-map.builder";
+import { buildInventoryData } from "../builders/inventory.builder";
 
 
 export async function importSet(setCode: string) {
@@ -22,6 +26,7 @@ export async function importSet(setCode: string) {
     const startTime = Date.now();
 
     console.log(`Import Started: ${setCode}`);
+
     //? To disable set import repeat
     const existingSet = await prisma.cardSet.findUnique({
         where: {
@@ -57,16 +62,7 @@ export async function importSet(setCode: string) {
         )
 
         // getcard data s sscyfll, reshape sa kailangan lang
-        const printingData = cards.map(card => ({
-            cardSetId: cardSet.id,
-            name: card.printing.name,
-            collectorNumber: card.printing.collectorNumber,
-            rarity: card.printing.rarity,
-            imageUrl: card.printing.imageUrl,
-            oracleText: card.printing.oracleText,
-            manaCost: card.printing.manaCost,
-            colors: card.printing.colors
-        }));
+        const printingData = buildPrintingData(cards, cardSet.id);
 
         // mass inert, randomized id?? 
         // with DB auto generated id
@@ -79,20 +75,12 @@ export async function importSet(setCode: string) {
         )
 
         // to get the card id:
-        const printingMap = new Map(
-            printings.map((printing: { collectorNumber: number; id: number; }) => [
-                printing.collectorNumber,
-                printing.id
-            ])
-        );
+        const printingMap = buildPrintingMap(printings);
         
         // non foil:
-        const variantData = cards.map(card => ({
-            printingId: printingMap.get(card.printing.collectorNumber)!,
-            condition: "NM",
-            language: "English",
-            foil: false,
-        }));
+        const variantData = cards.flatMap(card => 
+            generateVariants(printingMap.get(card.printing.collectorNumber)!)
+        )
 
         await createVariants(
             tx,
@@ -106,12 +94,7 @@ export async function importSet(setCode: string) {
         );
 
         // map them shitters
-        const inventoryData = variants.map((variant: { id: number; }) => ({
-            variantId: variant.id,
-            quantity: 0,
-            costPrice: 0,
-            sellPrice: 0
-        }))
+        const inventoryData = buildInventoryData(variants);
 
         // mass insert db
         await createInventory(
