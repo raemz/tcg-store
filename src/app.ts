@@ -6,6 +6,7 @@ import reportRoutes from "./routes/report.routes";
 import scryfallRoutes from "./routes/scryfall.route";
 import { errorHandler } from "./middleware/error.middleware";
 import importRoutes from "./routes/import.routes";
+import cardRoutes from "./routes/card.route";
 
 const app = new OpenAPIHono();
 app.doc("/doc", {
@@ -44,7 +45,7 @@ app.route("/sales", saleRoutes);
 app.route("/reports", reportRoutes);
 app.route("/scryfall", scryfallRoutes);
 app.route("/import", importRoutes);
-
+app.route("/cards", cardRoutes);
 
 
 
